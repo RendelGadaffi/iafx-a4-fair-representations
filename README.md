@@ -27,10 +27,10 @@ The data files are committed under `data/`, so there is nothing to download. Eve
 in the report is in `results/sweep.csv`, one row per dataset and fairness weight, so the
 tables can be checked without running anything.
 
-Runtime on a 4-core laptop, roughly: German 2 minutes, COMPAS 13 minutes, Adult about
-1.5 hours per LFR fit; the logistic baselines take seconds. The weights in the sweep are
-independent of each other, so running them as parallel processes cuts a full sweep to
-about one Adult fit.
+Runtimes are in the `seconds` column of `results/sweep.csv`: about 40 s for a German fit,
+12 minutes for a COMPAS fit and 54 minutes for an Adult fit, measured with the five weights
+of one dataset running side by side. Run them one at a time and they get proportionally
+faster. The logistic baselines take seconds.
 
 ## 1. Setup
 
@@ -72,8 +72,8 @@ group):
 | max_iter | 100 | `src/run_experiment.py`, `src/sweep.py` |
 | fairness_weight | Adult **50.0**, German **5.0**, COMPAS **20.0** | `src/run_experiment.py` |
 
-`max_iter=100` everywhere: every fit in `results/sweep.csv` converged in 21–97
-iterations at fairlearn's default tolerance (1e-6), so the cap never binds.
+`max_iter=100` everywhere. I picked it so that all fits converge at fairlearn's default
+tolerance (1e-6); they used 21–97 iterations, so the cap never binds.
 
 The `fairness_weight` per dataset in `src/run_experiment.py` comes from the sweep
 (`results/sweep.csv`): the lowest weight that reaches |DP_Diff| ≤ 0.06 while keeping DIR
