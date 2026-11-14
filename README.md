@@ -2,6 +2,9 @@
 
 Paper: *Learning Fair Representations*, Zemel, Wu, Swersky, Pitassi & Dwork, ICML 2013.
 Code: `fairlearn.preprocessing.PrototypeRepresentationLearner` (fairlearn 0.15).
+This is the repository linked from the report; the fork at
+`https://github.com/RendelGadaffi/fairlearn/tree/a4-fair-representations-study` carries the
+same study under `a4_study/` (identical code, data and tables).
 
 LFR is a **pre-processing** method. It learns K prototypes in the input space and maps
 every person to a softmax over the negative distances to them. The mapping is trained to
