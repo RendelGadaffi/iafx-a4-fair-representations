@@ -23,6 +23,8 @@ from metrics import demographic_parity_diff, disparate_impact_ratio, consistency
 SEED = 42
 N_PROTOTYPES = 10
 WEIGHTS = [0.0, 1.0, 5.0, 20.0, 50.0]
+# 100 is plenty: every fit in results/sweep.csv converged in 24-95 iterations
+MAX_ITER = 100
 
 
 def sweep(name, X, y, s):
@@ -52,7 +54,7 @@ def sweep(name, X, y, s):
         t0 = time.time()
         prl = PrototypeRepresentationLearner(n_prototypes=N_PROTOTYPES,
                                              fairness_weight=w,
-                                             max_iter=500,
+                                             max_iter=MAX_ITER,
                                              random_state=SEED)
         prl.fit(Xtr, ytr, sensitive_features=s_tr)
         add(w, prl.predict(Xte))

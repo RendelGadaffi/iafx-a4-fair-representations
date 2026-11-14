@@ -29,7 +29,8 @@ from metrics import demographic_parity_diff, disparate_impact_ratio, consistency
 SEED = 42
 # picked on the validation sweep in results/sweep.csv, see README
 N_PROTOTYPES = 10
-FAIRNESS_WEIGHTS = {"adult": 20.0, "german": 5.0, "compas": 5.0}
+MAX_ITER = 100  # all sweep fits converged within 24-95 iterations at tol 1e-6
+FAIRNESS_WEIGHTS = {"adult": 50.0, "german": 5.0, "compas": 20.0}
 
 DATASETS = {
     "adult": load_adult,
@@ -57,18 +58,18 @@ def run_one(name, X, y, s):
     rows["base_rate_unpriv"] = round(float(yte[s_te == 1].mean()), 4)
     rows["base_rate_priv"] = round(float(yte[s_te == 0].mean()), 4)
 
-    def measure(tag, pred):
+    def measure(tag, pred, scored=True):
         rows[tag] = {
             "dp_diff": round(float(demographic_parity_diff(pred, s_te)), 4),
             "dir": round(float(disparate_impact_ratio(pred, s_te)), 3),
             "consistency": round(float(consistency(Xte, pred)), 4),
         }
-        if pred is not yte.values:
+        if scored:
             rows[tag]["accuracy"] = round(float(accuracy_score(yte, pred)), 4)
             rows[tag]["f1"] = round(float(f1_score(yte, pred)), 4)
 
     # no-mitigation reference points
-    measure("labels_before", yte.values)
+    measure("labels_before", yte.values, scored=False)
 
     t0 = time.time()
     lr = LogisticRegression(max_iter=2000).fit(Xtr, ytr)
@@ -78,7 +79,7 @@ def run_one(name, X, y, s):
     prl = PrototypeRepresentationLearner(
         n_prototypes=N_PROTOTYPES,
         fairness_weight=FAIRNESS_WEIGHTS[name],
-        max_iter=500,
+        max_iter=MAX_ITER,
         random_state=SEED,
     )
     prl.fit(Xtr, ytr.values, sensitive_features=s_tr)
